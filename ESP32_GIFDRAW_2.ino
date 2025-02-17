@@ -1,5 +1,4 @@
-#define NORMAL_SPEED
-#define SERIALDEBUG false
+// #define SERIALDEBUG
 
 #include <FS.h>
 #include <SD.h>
@@ -27,21 +26,21 @@ void setup() {
     while (true);
   }
 
-  if (SERIALDEBUG) {
-    Serial.println("SD card initialized successfully.");
-  }
+  #if defined(SERIALDEBUG)
+  Serial.println("SD card initialized successfully.");
+  #endif
 
   gif.begin(BIG_ENDIAN_PIXELS);
 }
 
 void loop() {
 
-  if (gif.open(gifFiles[gifIndex].c_str(), fileOpen, fileClose, fileRead, fileSeek, GIFDraw)) {
-    if (SERIALDEBUG) {
-      Serial.print("SUCCESS gif.open: ");
-      Serial.println(gifFiles[gifIndex].c_str());
-      Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
-    }
+if (gif.open(gifFiles[gifIndex].c_str(), fileOpen, fileClose, fileRead, fileSeek, GIFDraw)) {
+#if defined(SERIALDEBUG)
+    Serial.print("SUCCESS gif.open: ");
+    Serial.println(gifFiles[gifIndex].c_str());
+    Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
+#endif
 
     while (gif.playFrame(true, NULL)) {
       yield();
@@ -60,10 +59,10 @@ void* fileOpen(const char* filename, int32_t* pFileSize) {
   if (*f) {
     *pFileSize = f->size();
     
-    if (SERIALDEBUG) {
-      Serial.print("SUCCESS - fileopen: ");
-      Serial.println(filename);
-    }
+#if defined(SERIALDEBUG)
+    Serial.print("SUCCESS - fileopen: ");
+    Serial.println(filename);
+#endif
 
     return (void*)f;
   } else {
@@ -75,9 +74,9 @@ void* fileOpen(const char* filename, int32_t* pFileSize) {
 }
 
 void fileClose(void* pHandle) {
-  if (SERIALDEBUG) {
-    Serial.println("ENTER - fileClose");
-  }
+#if defined(SERIALDEBUG)
+  Serial.println("ENTER - fileClose");
+#endif
 
   File* f = static_cast<File*>(pHandle);
   if (f != NULL) {
@@ -87,51 +86,52 @@ void fileClose(void* pHandle) {
 }
 
 int32_t fileRead(GIFFILE* pFile, uint8_t* pBuf, int32_t iLen) {
-  if (SERIALDEBUG) {
-    Serial.println("ENTER - fileRead");
-  }
+#if defined(SERIALDEBUG)
+  Serial.println("ENTER - fileRead");
+#endif
 
   File* f = static_cast<File*>(pFile->fHandle);
   if (f == NULL) {
     Serial.println("f == NULL");
     return 0;
   }
-  if (SERIALDEBUG) {
-    Serial.print("File* f= ");
-    Serial.print(reinterpret_cast<uintptr_t> (f));
-    Serial.print("\nCalling f->read");
-    Serial.print("\npBuf: ");
-    Serial.print(reinterpret_cast<uintptr_t> (pBuf));
-    Serial.print("\niLen: ");
-    Serial.print(iLen, HEX);
-  }
+#if defined(SERIALDEBUG)
+  Serial.print("File* f= ");
+  Serial.print(reinterpret_cast<uintptr_t> (f));
+  Serial.print("\nCalling f->read");
+  Serial.print("\npBuf: ");
+  Serial.print(reinterpret_cast<uintptr_t> (pBuf));
+  Serial.print("\niLen: ");
+  Serial.print(iLen, HEX);
+#endif
 
   int32_t iBytesRead = f->read(pBuf, iLen);
   pFile->iPos = f->position();
   
-  if (SERIALDEBUG) {
-    Serial.print("iBytesRead = ");
-    Serial.println(iBytesRead);
-    Serial.print("iPos = ");
-    Serial.println(pFile->iPos);
-  }
+#if defined(SERIALDEBUG)
+  Serial.print("iBytesRead = ");
+  Serial.println(iBytesRead);
+  Serial.print("iPos = ");
+  Serial.println(pFile->iPos);
+#endif
 
   return iBytesRead;
 }
 
 int32_t fileSeek(GIFFILE* pFile, int32_t iPosition) {
-  if (SERIALDEBUG) {
-    Serial.println("ENTER - fileSeek");
-  }
+#if defined(SERIALDEBUG)
+  Serial.println("ENTER - fileSeek");
+#endif
+
   File* f = static_cast<File*>(pFile->fHandle);
   if (f == NULL) return 0;
   f->seek(iPosition);
   pFile->iPos = f->position();
 
-  if (SERIALDEBUG) {
-    Serial.print("iPos = ");
-    Serial.println(pFile->iPos);
-  }
+#if defined(SERIALDEBUG)
+  Serial.print("iPos = ");
+  Serial.println(pFile->iPos);
+#endif
 
   return pFile->iPos;
 }
