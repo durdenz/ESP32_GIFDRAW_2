@@ -34,22 +34,25 @@ void setup() {
 }
 
 void loop() {
+  PlayGIF(gifFiles[gifIndex]);
+}
 
-if (gif.open(gifFiles[gifIndex].c_str(), fileOpen, fileClose, fileRead, fileSeek, GIFDraw)) {
-#if defined(SERIALDEBUG)
-    Serial.print("SUCCESS gif.open: ");
-    Serial.println(gifFiles[gifIndex].c_str());
-    Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
-#endif
-
+bool PlayGIF(String gifFile) {
+  if (gif.open(gifFile.c_str(), fileOpen, fileClose, fileRead, fileSeek, GIFDraw)) {
+  #if defined(SERIALDEBUG)
+      Serial.print("SUCCESS gif.open: ");
+      Serial.println(gifFiles[gifIndex].c_str());
+      Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
+  #endif
     while (gif.playFrame(true, NULL)) {
       yield();
     }
     gif.close();
+    return(true);
   } else {
     Serial.print("FAIL gif.open: ");
-    Serial.println(gifFiles[gifIndex].c_str());
-    while(true);
+    Serial.println(gifFile.c_str());
+    return (false);
   }
 }
 
